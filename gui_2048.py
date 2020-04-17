@@ -82,8 +82,9 @@ def placeRandomTile():
 	randpos = random.choice(blank)
 	x1, y1 = randpos
 	Board[x1,y1] = randomVal
-	
-	canvas.create_image(constants.positions[randpos], image=ImageNames[randomVal])
+	val = randpos.tolist()
+	pos = get_key(constants.BoardPos, val)
+	canvas.create_image(constants.positions[pos], image=ImageNames[randomVal])
 
 def getStartBoard():
 
@@ -116,17 +117,58 @@ def getStartBoard():
 
 getStartBoard()
 
+def operateRowleft(row):
+    output_array = []
+    num_zeros_to_append = 0
+    current_value = 0
+    for elem in row:
+        if elem == 0:
+            num_zeros_to_append += 1
+        elif current_value == 0:
+            current_value = elem
+        else:
+            if elem == current_value:
+                current_value = 0
+                num_zeros_to_append += 1
+                output_array.append(2 * elem)
+            else:
+                output_array.append(current_value)
+                current_value = elem
+    if current_value != 0:
+        output_array.append(current_value)
+    for _ in range(num_zeros_to_append):
+        output_array.append(0)
+    return output_array
+
+def operateRowRight(row):
+    output_array = []
+    num_zeros_to_append = 0
+    current_value = 0
+    for elem in row:
+        if elem == 0:
+            num_zeros_to_append += 1
+        elif current_value == 0:
+            current_value = elem
+        else:
+            if elem == current_value:
+                current_value = 0
+                num_zeros_to_append += 1
+                output_array.insert(0, 2 * elem)
+            else:
+                output_array.insert(0, current_value)
+                current_value = elem
+    if current_value != 0:
+        output_array.insert(0, current_value)
+    
+    for _ in range(num_zeros_to_append):
+        output_array.insert(0, 0)
+    return output_array
+
 def moveleft(Event):
-	global Board
 	for row_index, row in enumerate(Board):
-		Board[row_index] = sorted(row, key=bool, reverse=True)
-		current_index = Board[row_index][0]
-		for i in range(1, 4):
-			if current_index == Board[row_index][i] and Board[row_index][i] != 0:
-				Board[row_index][i-1] *= 2
-				Board[row_index][i] = 0
-			current_index = Board[row_index][i]
-		Board[row_index] = sorted(row, key=bool, reverse=True)
+		newRow = operateRowleft(row)
+		Board[row_index] = newRow
+
 	for row_index,row in enumerate(Board):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
@@ -134,7 +176,20 @@ def moveleft(Event):
 	placeRandomTile()
 	print(Board)
 
-root.bind("<Left>",moveleft)
+def moveRight(Event):
+	for row_index, row in enumerate(Board):
+		newRow = operateRowRight(row)
+		Board[row_index] = newRow
+
+	for row_index,row in enumerate(Board):
+		for index, element in enumerate(row):
+			pos = get_key(constants.BoardPos, [row_index, index])
+			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	placeRandomTile()
+	print(Board)
+
+root.bind("<Left>", moveleft)
+root.bind("<Right>", moveRight)
 
 
 root.mainloop()
