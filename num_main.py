@@ -82,6 +82,7 @@ def placeRandomTile():
 	randpos = random.choice(blank)
 	inlist = randpos.tolist()
 	pos = get_key(constants.BoardPos, inlist)
+	
 	canvas.create_image(constants.positions[pos], image=ImageNames[randomVal])
 
 def getStartBoard():
