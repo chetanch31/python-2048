@@ -91,11 +91,19 @@ def moveRight():
         print(Board)
 
 def moveUp():
-        pass
+    for column in range(4):
+        newRow = operateRowleft(Board[:, column])
+        Board[:, column] = newRow
+    placeRandom()
+    print(Board)
+
 
 def moveDown():
-        pass
-
+    for column in range(4):
+        newRow = operateRowRight(Board[:, column])
+        Board[:, column] = newRow
+    placeRandom()
+    print(Board)
 
 
 
