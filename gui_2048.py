@@ -188,8 +188,33 @@ def moveRight(Event):
 	placeRandomTile()
 	print(Board)
 
+
+def moveUp(Event):
+	for column in range(4):
+		newRow = operateRowleft(Board[:, column])
+		Board[:, column] = newRow
+	for row_index, row in enumerate(Board):
+		for index, element in enumerate(row):
+			pos = get_key(constants.BoardPos, [row_index, index])
+			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	placeRandomTile()
+	print(Board)
+
+def moveDown(Event):
+        for column in range(4):
+                newRow = operateRowRight(Board[:, column])
+                Board[:, column] = newRow
+        for row_index, row in enumerate(Board):
+                for index, element in enumerate(row):
+                        pos = get_key(constants.BoardPos, [row_index, index])
+                        canvas.create_image(constants.positions[pos], image=ImageNames[element])
+        placeRandomTile()
+        print(Board)
+
 root.bind("<Left>", moveleft)
 root.bind("<Right>", moveRight)
+root.bind("<Up>", moveUp)
+root.bind("<Down>", moveDown)
 
 
 root.mainloop()
