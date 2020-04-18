@@ -117,56 +117,23 @@ def getStartBoard():
 
 getStartBoard()
 
-def operateRowleft(row):
-    output_array = []
-    num_zeros_to_append = 0
-    current_value = 0
-    for elem in row:
-        if elem == 0:
-            num_zeros_to_append += 1
-        elif current_value == 0:
-            current_value = elem
-        else:
-            if elem == current_value:
-                current_value = 0
-                num_zeros_to_append += 1
-                output_array.append(2 * elem)
-            else:
-                output_array.append(current_value)
-                current_value = elem
-    if current_value != 0:
-        output_array.append(current_value)
-    for _ in range(num_zeros_to_append):
-        output_array.append(0)
-    return output_array
-
-def operateRowRight(row):
-    output_array = []
-    num_zeros_to_append = 0
-    current_value = 0
-    for elem in row:
-        if elem == 0:
-            num_zeros_to_append += 1
-        elif current_value == 0:
-            current_value = elem
-        else:
-            if elem == current_value:
-                current_value = 0
-                num_zeros_to_append += 1
-                output_array.insert(0, 2 * elem)
-            else:
-                output_array.insert(0, current_value)
-                current_value = elem
-    if current_value != 0:
-        output_array.insert(0, current_value)
-    
-    for _ in range(num_zeros_to_append):
-        output_array.insert(0, 0)
-    return output_array
+def slide_row(row):
+    nonzero = row[row!=0]
+    if len(nonzero) == 4 and nonzero[0] == nonzero[1] and nonzero[2]== nonzero[3]:
+        return np.array([nonzero[:2].sum(), nonzero[2:].sum(),0,0])
+    for i in range(len(nonzero)-1):
+        if nonzero[i] == nonzero[i+1]:
+            nonzero[i] += nonzero[i+1]
+            nonzero[i+1] = 0
+            nonzero = nonzero[nonzero!=0]
+            break
+    new_row = np.zeros(4)
+    new_row[:len(nonzero)] = nonzero
+    return new_row
 
 def moveleft(Event):
 	for row_index, row in enumerate(Board):
-		newRow = operateRowleft(row)
+		newRow = slide_row(row)
 		Board[row_index] = newRow
 
 	for row_index,row in enumerate(Board):
@@ -178,8 +145,9 @@ def moveleft(Event):
 
 def moveRight(Event):
 	for row_index, row in enumerate(Board):
-		newRow = operateRowRight(row)
-		Board[row_index] = newRow
+		getrow = slide_row(row[::-1])
+		newrow = getrow[::-1]
+		Board[row_index] = newrow
 
 	for row_index,row in enumerate(Board):
 		for index, element in enumerate(row):
@@ -191,8 +159,10 @@ def moveRight(Event):
 
 def moveUp(Event):
 	for column in range(4):
-		newRow = operateRowleft(Board[:, column])
-		Board[:, column] = newRow
+		row = Board[:, column]
+		newrow = slide_row(row)
+		Board[:, column] = newrow
+
 	for row_index, row in enumerate(Board):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
@@ -201,21 +171,28 @@ def moveUp(Event):
 	print(Board)
 
 def moveDown(Event):
-        for column in range(4):
-                newRow = operateRowRight(Board[:, column])
-                Board[:, column] = newRow
-        for row_index, row in enumerate(Board):
-                for index, element in enumerate(row):
-                        pos = get_key(constants.BoardPos, [row_index, index])
-                        canvas.create_image(constants.positions[pos], image=ImageNames[element])
-        placeRandomTile()
-        print(Board)
+	for column in range(4):
+		row = Board[:, column]
+		getrow = slide_row(row[::-1])
+		newrow = getrow[::-1]
+		Board[:, column] = newrow
+	
+	for row_index, row in enumerate(Board):
+		for index, element in enumerate(row):
+			pos = get_key(constants.BoardPos, [row_index, index])
+			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	
+	placeRandomTile()
+	print(Board)
 
 root.bind("<Left>", moveleft)
 root.bind("<Right>", moveRight)
 root.bind("<Up>", moveUp)
 root.bind("<Down>", moveDown)
-
+root.bind("<a>", moveleft)
+root.bind("<d>", moveRight)
+root.bind("<w>", moveUp)
+root.bind("<s>", moveDown)
 
 root.mainloop()
 
