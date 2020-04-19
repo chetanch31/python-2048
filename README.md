@@ -1,2 +1,3 @@
 # python-2048
-2048 game with Python and Tkinter
+Implementing the game 2048 in python using tkinter and numpy
+
