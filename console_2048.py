@@ -4,6 +4,7 @@ import random
 import sys
 
 Board = np.zeros((4,4))
+score = 0
 
 def Start():
         randPos1 = random.choice(constants.y_axis_labels) + random.choice(constants.x_axis_labels)
@@ -34,6 +35,7 @@ def isValid():
                 return True
 
 def endGame():
+    print("Total Score: ",score)
     sys.exit("Game Over")
 
 def placeRandom():
@@ -52,11 +54,13 @@ def placeRandom():
 
 
 def slide_row(row):
+    global score
     nonzero = row[row!=0]
     if len(nonzero) == 4 and nonzero[0] == nonzero[1] and nonzero[2]== nonzero[3]:
         return np.array([nonzero[:2].sum(), nonzero[2:].sum(),0,0])
     for i in range(len(nonzero)-1):
         if nonzero[i] == nonzero[i+1]:
+            score = int(score + nonzero[i] + nonzero[i+1])
             nonzero[i] += nonzero[i+1]
             nonzero[i+1] = 0
             nonzero = nonzero[nonzero!=0]
@@ -96,18 +100,23 @@ def moveDown():
 
 
 def main():
+        global score
         Start()
         GameOver = False
         while not GameOver:
                 move = input("Enter your next move: ")
                 if move.lower() == "d":
                         moveRight()
+                        print("Score= ",score)
                 elif move.lower() == "s": 
                         moveDown()
+                        print("Score= ",score)
                 elif move.lower() == "a": 
                         moveLeft()
+                        print("Score= ",score)
                 elif move.lower() == "w":
                         moveUp()
+                        print("Score= ",score)
                 else:
                         print("Invalid Move")
 
