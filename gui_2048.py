@@ -3,7 +3,8 @@ from PIL import ImageTk, Image
 import random
 import numpy as np
 import constants
-
+from tkinter import messagebox
+import sys
 
 root = Tk()
 root.title("2048")
@@ -49,7 +50,13 @@ ImageNames = {
 	2048:num2048
 }
 
+score = 0
 
+frame = LabelFrame(root, text="Score", padx=10, pady=10)
+frame.pack()
+
+scoreBoard = Label(frame, text=score, padx=15, pady=5)
+scoreBoard.pack()
 
 def get_x_y_coordinate(row, column):
 	x = column * 100
@@ -74,17 +81,45 @@ def drawEmpty():
 	for i in constants.positions.values():
 		canvas.create_image(i, image=num0)
 
+def isValid():
+    for row in Board:
+        for index in range(len(row)-1):
+            if row[index] == row[index+1]:
+                return True
+
+    for column in range(4):
+        row = Board[:, column]
+        for index in range(len(row)-1):
+            if row[index] == row[index+1]:
+                return True
+
+def gameOver():
+	global Board
+	response = messagebox.askyesno("Game Over", "Game Over, Play again?")
+	if response == 1:
+		Board = np.zeros((4,4))
+		create_board()
+		getStartBoard()
+	else:
+		sys.exit("Game Closed")
+
 def placeRandomTile():
-	if not np.any(Board == 0):
-		pass
-	randomVal = random.choice([2,4])
-	blank = np.argwhere(Board == 0)
-	randpos = random.choice(blank)
-	x1, y1 = randpos
-	Board[x1,y1] = randomVal
-	val = randpos.tolist()
-	pos = get_key(constants.BoardPos, val)
-	canvas.create_image(constants.positions[pos], image=ImageNames[randomVal])
+	try:
+		randomVal = random.choice([2,4])
+		blank = np.argwhere(Board == 0)
+		randpos = random.choice(blank)
+		x1, y1 = randpos
+		Board[x1,y1] = randomVal
+		val = randpos.tolist()
+		pos = get_key(constants.BoardPos, val)
+		canvas.create_image(constants.positions[pos], image=ImageNames[randomVal])
+	except IndexError:
+		if isValid():
+			pass
+		else:
+			gameOver()
+
+
 
 def getStartBoard():
 
@@ -113,7 +148,6 @@ def getStartBoard():
 	Board[x1,y1] = randNo1
 	Board[x2,y2] = randNo2
 
-	print(Board)
 
 getStartBoard()
 
@@ -141,7 +175,6 @@ def moveleft(Event):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
 	placeRandomTile()
-	print(Board)
 
 def moveRight(Event):
 	for row_index, row in enumerate(Board):
@@ -154,7 +187,6 @@ def moveRight(Event):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
 	placeRandomTile()
-	print(Board)
 
 
 def moveUp(Event):
@@ -168,7 +200,6 @@ def moveUp(Event):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
 	placeRandomTile()
-	print(Board)
 
 def moveDown(Event):
 	for column in range(4):
@@ -183,7 +214,6 @@ def moveDown(Event):
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
 	
 	placeRandomTile()
-	print(Board)
 
 root.bind("<Left>", moveleft)
 root.bind("<Right>", moveRight)
