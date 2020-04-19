@@ -8,10 +8,10 @@ import sys
 
 root = Tk()
 root.title("2048")
-root.geometry("600x600")
+root.geometry("500x600")
 
-gameTitle = Label(root, text="Game-2048")
-gameTitle.config(font=("Times New Roman", 30))
+gameTitle = Label(root, text="2048", fg="#422568")
+gameTitle.config(font=("Times New Roman", 50, "bold"))
 gameTitle.pack()
 
 gameWindow = Frame(root)
@@ -52,10 +52,10 @@ ImageNames = {
 
 score = 0
 
-frame = LabelFrame(root, text="Score", padx=10, pady=10)
+frame = LabelFrame(root, text="Score", padx=10, pady=10, labelanchor="n",font=("Arial", 20, "bold"),bd=5,width=60,fg="blue")
 frame.pack()
 
-scoreBoard = Label(frame, text=score, padx=15, pady=5)
+scoreBoard = Label(frame, text=score, padx=15, pady=5,font=("Times New Roman",15))
 scoreBoard.pack()
 
 def get_x_y_coordinate(row, column):
@@ -92,6 +92,12 @@ def isValid():
         for index in range(len(row)-1):
             if row[index] == row[index+1]:
                 return True
+
+def updateScoreBoard():
+	global scoreBoard
+	scoreBoard.destroy()
+	scoreBoard = Label(frame, text=score, padx=15, pady=5,font=("Times New Roman",15))
+	scoreBoard.pack()
 
 def gameOver():
 	global Board
@@ -152,11 +158,13 @@ def getStartBoard():
 getStartBoard()
 
 def slide_row(row):
+    global score
     nonzero = row[row!=0]
     if len(nonzero) == 4 and nonzero[0] == nonzero[1] and nonzero[2]== nonzero[3]:
         return np.array([nonzero[:2].sum(), nonzero[2:].sum(),0,0])
     for i in range(len(nonzero)-1):
         if nonzero[i] == nonzero[i+1]:
+            score = int(score + nonzero[i] + nonzero[i+1])
             nonzero[i] += nonzero[i+1]
             nonzero[i+1] = 0
             nonzero = nonzero[nonzero!=0]
@@ -174,6 +182,7 @@ def moveleft(Event):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	updateScoreBoard()
 	placeRandomTile()
 
 def moveRight(Event):
@@ -186,6 +195,7 @@ def moveRight(Event):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	updateScoreBoard()
 	placeRandomTile()
 
 
@@ -199,6 +209,7 @@ def moveUp(Event):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
+	updateScoreBoard()
 	placeRandomTile()
 
 def moveDown(Event):
@@ -212,7 +223,7 @@ def moveDown(Event):
 		for index, element in enumerate(row):
 			pos = get_key(constants.BoardPos, [row_index, index])
 			canvas.create_image(constants.positions[pos], image=ImageNames[element])
-	
+	updateScoreBoard()
 	placeRandomTile()
 
 root.bind("<Left>", moveleft)
