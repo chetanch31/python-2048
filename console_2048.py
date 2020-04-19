@@ -1,6 +1,7 @@
 import numpy as np 
 import constants
 import random
+import sys
 
 Board = np.zeros((4,4))
 
@@ -20,13 +21,35 @@ def Start():
 
         print(Board)
 
+def isValid():
+    for row in Board:
+        for index in range(len(row)-1):
+            if row[index] == row[index+1]:
+                return True
+
+    for column in range(4):
+        row = Board[:, column]
+        for index in range(len(row)-1):
+            if row[index] == row[index+1]:
+                return True
+
+def endGame():
+    sys.exit("Game Over")
+
 def placeRandom():
-    blank = np.argwhere(Board == 0)
-    randomVal = random.choice([2,4])
-    randompos = random.choice(blank)
-    x1, y1 = randompos
-    Board[x1,y1] = randomVal
-    print(Board)
+    try:
+        blank = np.argwhere(Board == 0)
+        randomVal = random.choice([2,4])
+        randompos = random.choice(blank)
+        x1, y1 = randompos
+        Board[x1,y1] = randomVal
+        print(Board)
+    except IndexError:
+        if isValid():
+            pass
+        else:
+            endGame()
+
 
 def slide_row(row):
     nonzero = row[row!=0]
@@ -47,7 +70,6 @@ def moveLeft():
         newRow = slide_row(row)
         Board[row_index] = newRow
     placeRandom()
-    print(Board)
 
 def moveRight():
     for row_index, row in enumerate(Board):
@@ -55,7 +77,6 @@ def moveRight():
         newrow = getrow[::-1]
         Board[row_index] = newrow
     placeRandom()
-    print(Board)
 
 def moveUp():
     for column in range(4):
@@ -63,7 +84,6 @@ def moveUp():
         newrow = slide_row(row)
         Board[:, column] = newrow
     placeRandom()
-    print(Board)
 
 
 def moveDown():
@@ -73,7 +93,6 @@ def moveDown():
         newrow = getrow[::-1]
         Board[:, column] = newrow
     placeRandom()
-    print(Board)
 
 
 def main():
